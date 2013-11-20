@@ -8,7 +8,7 @@ public class Chat {
 	Connection connection = new Connection();
 	private static final String CONTACT_DELIMETER = ",";
 	
-	public Chat() throws Exception
+	public Chat()
 	{
 		server = new Server();
 		contacts = new HashMap<String, Socket>();

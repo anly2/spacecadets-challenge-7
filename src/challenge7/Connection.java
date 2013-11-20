@@ -10,11 +10,6 @@ public class Connection {
 	private int remotePort;
 	ServerSocket server;
 	Socket client;
-	public Connection() throws Exception
-	{
-		this.createServerSocket();
-		this.createClientSocket();
-	}
 	public void setLocalData(String localIP, int localPort)
 	{
 		this.localIP = localIP;
