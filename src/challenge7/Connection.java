@@ -4,10 +4,10 @@ import java.io.*;
 
 public class Connection {
 	//private String user;
-	//private String localIP;
+	private String localIP;
 	private int localPort;
-	//private String remoteIP;
-	//private int remotePort;
+	private String remoteIP;
+	private int remotePort;
 	ServerSocket server;
 	Socket client;
 	public Connection() throws Exception
@@ -17,25 +17,26 @@ public class Connection {
 	}
 	public void setLocalData(String localIP, int localPort)
 	{
-		//this.localIP = localIP;
+		this.localIP = localIP;
 		this.localPort = localPort;
 	}
 	public void createServerSocket() throws Exception
 	{
 		server = new ServerSocket(localPort);
 	}
-	/*public void setRemoteData(String remoteIP, int remotePort)
+	public void setRemoteData(String remoteIP, int remotePort)
 	{
 		this.remoteIP = remoteIP;
 		this.remotePort = remotePort;
-	}*/
+	}
 	public void setUser(String user)
 	{
 		//this.user = user;
 	}
-	public void createClientSocket() throws Exception
+	public void createClientSocket(String setHostIP, int setHostPort) throws Exception
 	{
-		client = server.accept();
+		setRemoteData(setHostIP, setHostPort);
+		client = new Socket(localIP, localPort);
 	}
 	public void send(String content) throws Exception
 	{
