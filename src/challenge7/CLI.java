@@ -28,6 +28,7 @@ public class CLI {
 				System.out.print("Password: ");
 				password = scanner.nextLine();
 			}
+			////password = hash(password);
 		
 		//Check if credentials are correct
 		if (!chat.login(username, password))

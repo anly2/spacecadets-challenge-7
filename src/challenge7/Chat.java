@@ -1,12 +1,15 @@
 package challenge7;
 import java.util.*;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 public class Chat {
-	private HashMap<String, Socket> contacts;
-	private String username;
-	Server server;
-	Connection connection = new Connection();
+	protected String username;
+	protected Server server;
+	protected HashMap<String, Socket> contacts;
+	
 	private static final String CONTACT_DELIMETER = ",";
+	private static final int port = 27327;
 	
 	public Chat()
 	{
@@ -14,15 +17,21 @@ public class Chat {
 		contacts = new HashMap<String, Socket>();
 	}
 	
+	public String getUser() {
+		return username;
+	}
+	
 	public boolean login(String username, String password)
 	{
-		boolean loged = server.login(username, password);
-		if(!loged)
+		boolean logged = server.login(username, password, port);
+		
+		if(!logged)
 			return false;
 		
 		this.username = username;
+		//start ListenerThread
 		
-		String csl = server.getContacts();
+		String csl = server.getContacts(this.username);
 		String[] contactList = csl.split(CONTACT_DELIMETER);
 		
 		for (String n : contactList)
@@ -30,34 +39,38 @@ public class Chat {
 		
 		return true;
 	}
-	public String getUser()
-	{
-		return username;
-	}
+	
 	public void sendMessage(String recipient, String message)
 	{
-		connect(recipient);
+		if (!connect(recipient))
+			return; ////Exception!
+
+		Socket socket = contacts.get(recipient);
+		PrintWriter sender;
 		
+		try {
+			sender = new PrintWriter(socket.getOutputStream(), true);
+			sender.println(message);
+			sender.close();
+		}
+		catch (IOException e) {}
 	}
+	
 	public void addContact(String recipient)
 	{
 		server.addContact(getUser(), recipient);
 	}
+
 	public boolean connect(String recipient)
 	{
 		if ((!contacts.containsKey(recipient)) || (contacts.get(recipient)==null))
 			contacts.put(recipient, server.query(recipient));
 		
-		String[] connect = contacts.get(recipient).toString().split(":");
-		connection.createClientSocket(connect[0], new Integer(connect[1]));
-		
 		return contacts.get(recipient) == null;
 	}
+
 	public String[] getContacts()
 	{
 		return contacts.keySet().toArray(new String[0]);
 	}
-	
-	
-
 }
