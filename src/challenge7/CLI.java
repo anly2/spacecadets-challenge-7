@@ -155,6 +155,7 @@ public class CLI {
 		}
 
 		scanner.close();
+		chat.close();
 		System.out.println("Bye!");
 	}
 }
