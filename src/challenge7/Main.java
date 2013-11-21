@@ -5,8 +5,18 @@ public class Main {
 		
 		//Test the http requests
 		Server server = new Server();
-		String respons = server.sendGet("http://users.ecs.soton.ac.uk/aa5u12/Chat/?contacts&user=halit");
-		System.out.println(respons);
+		String response = null;
+		try {
+			response = server.sendPost("http://users.ecs.soton.ac.uk/aa5u12/Chat/index.php?login", "user=halit");
+			
+			if (server.login("a", "b", 27327))
+				System.out.println("Success");
+			else
+				System.out.println("Failure");
+			
+		}catch (Exception e) {}
+		
+		System.out.println(response);
 	}
 
 }
