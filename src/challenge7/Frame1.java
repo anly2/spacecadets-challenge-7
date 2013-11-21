@@ -1,7 +1,6 @@
 package challenge7;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;  //notice javax
 
 public class Frame1 extends JFrame
@@ -47,9 +46,9 @@ public class Frame1 extends JFrame
 			lblPassword.setFont(strongFont);
 		pane.add (lblPassword);
 			
-		JTextField txtUsername = new JTextField  (10);
-		JTextField txtPassword = new JTextField  (10);
-		JButton btnSubmit = new JButton ("Enter");
+		//JTextField txtUsername = new JTextField  (10);
+		//JTextField txtPassword = new JTextField  (10);
+		//JButton btnSubmit = new JButton ("Enter");
 		
 		setVisible(true); // display this frame
 	}
