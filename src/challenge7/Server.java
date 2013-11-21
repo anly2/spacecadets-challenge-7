@@ -33,6 +33,10 @@ public class Server {
 
 	public Socket query (String contact) {
 		String response = sendGet (serverAddress + "/getSocket.php?" +"user="+contact);
+		
+		if (response.toLowerCase().contains("fail"))
+			return null; //Exception
+		
 		String[] splitResponse = response.split(":");
 		Socket socket = null;
 		
