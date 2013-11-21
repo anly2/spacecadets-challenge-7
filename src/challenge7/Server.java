@@ -14,25 +14,25 @@ public class Server {
 	////CHANGE
 	private static final String serverIP = "192.168.99.1";
 	private static final int serverPort = 80;
-	private static final String serverAddress = "http://"+serverIP+":"+serverPort + "/chat/"; 
+	private static final String serverAddress = "http://"+serverIP+":"+serverPort + "/Chat/"; 
 	
 	//Server () {}
 	
 	/** @deprecated Use login(String, String, int) instead*/
 	public boolean login (String username, String password) {
-		String response = sendGet (serverAddress + "/login.php?" +"user="+username +"&"+ "pass="+password);
+		String response = sendGet (serverAddress + "/?login&" +"user="+username +"&"+ "pass="+password);
 			
 		return (response.toLowerCase().contains("success"));
 	}
 
 	public boolean login (String username, String password, int port) {
-		String response = sendGet (serverAddress + "/login.php?" +"user="+username +"&"+ "pass="+password +"&"+ "port="+port);
+		String response = sendGet (serverAddress + "/?login&" +"user="+username +"&"+ "pass="+password +"&"+ "port="+port);
 			
 		return (response.toLowerCase().contains("success"));
 	}
 
 	public Socket query (String contact) {
-		String response = sendGet (serverAddress + "/getSocket.php?" +"user="+contact);
+		String response = sendGet (serverAddress + "/?query&" +"user="+contact);
 		
 		if (response.toLowerCase().contains("fail"))
 			return null; //Exception
@@ -51,11 +51,11 @@ public class Server {
 	}
 	
 	public String getContacts (String username) {
-		return sendGet (serverAddress + "/getContacts.php?" +"user="+username);
+		return sendGet (serverAddress + "/?contacts&" +"user="+username);
 	}
 
 	public boolean addContact (String username, String contact) {
-		String response = sendGet (serverAddress + "/addContact.php?" +"user="+username +"&"+ "contact="+contact);
+		String response = sendGet (serverAddress + "/?add&" +"user="+username +"&"+ "contact="+contact);
 			
 		return (response.toLowerCase().contains("success"));
 	}
