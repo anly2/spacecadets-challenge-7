@@ -43,6 +43,7 @@ if (isset($_REQUEST['login']))
 
       $found = true;
       echo "Sueccessfully logged in {".$details[0]."}";
+      echo "\n".$details[2];
       break;
    }
 
@@ -55,7 +56,7 @@ if (isset($_REQUEST['login']))
       }
 
 
-      //Automatic Registraion
+      //Automatic Registration
 
       $username = preg_replace ("/[^a-zA-Z0-9_\-\.@]/", "", $_REQUEST['user']);
       $password = preg_replace ("/[^a-zA-Z0-9_ ]/", "", $_REQUEST['pass']);
@@ -68,6 +69,9 @@ if (isset($_REQUEST['login']))
 
       array_push ($users, $username,$password,$ip,$port);
       file_put_contents (db_users, implode("\n", $users));
+      file_put_contents (db_contacts, "\n", FILE_APPEND);
+
+      echo "Successfully registered {$username}";
    }
 
    exit (0);
@@ -83,8 +87,8 @@ if (isset($_REQUEST['query']))
    }
 
    $users = array (
-      "anko,okna,,",
-      "halit,tilah,,"
+      "anko,okna,152.78.236.39,27327",
+      "halit,tilah,,27327"
    );
 
    //$users = file_exists(db_users) ? file(db_users) : array();
@@ -96,13 +100,13 @@ if (isset($_REQUEST['query']))
       if ($details[0] != $_REQUEST['user'])
          continue;
 
-      if ( trim($details[2].$details[3]) == "")
+      if (trim($details[2]) == "" || trim($details[3]) == "")
       {
          echo "Failure: User not logged in.";
          exit (1);
       }
 
-      echo $details[2].":".$details[3];
+      echo $details[2].":".$details[3] .":Success";
       exit (0);
    }
 
