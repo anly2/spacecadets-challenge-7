@@ -101,7 +101,7 @@ public class Chat {
 		}
 		return null;
 	}
-	public void stop(){
+	public void close(){
 		listener.interrupt();
 	}
 }
