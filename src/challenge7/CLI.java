@@ -5,6 +5,12 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Provides a Command Line Interface for using the {@link Chat} class
+ * <p>On the command line, type <code>/help</code> for list of commands</p>
+ * @see Chat
+ * @see WindowLogin
+ */
 public class CLI {
 	public static void main (String[] args) {
 		//Initialization
@@ -39,13 +45,14 @@ public class CLI {
 		}
 			
 		
+		//Handle user input
 		String recipient = null;
-		
 		while (true)
 		{
 			System.out.print(chat.getUser() + (recipient==null ? "" : " to "+recipient) + " > ");
 			String input = scanner.nextLine();
 			
+			//Handle messages
 			if (!input.matches("^\\s*/"))
 			{
 				//Send message
@@ -60,6 +67,7 @@ public class CLI {
 			}
 			
 			
+			//Handle the help command
 			String regexHelpCmd = "^\\s*/(help|h|?).*";
 			if (input.matches(regexHelpCmd))
 			{
@@ -85,7 +93,8 @@ public class CLI {
 			}
 			
 			
-			String regexAddCmd = "^\\s*/(exit|quit|e|q).*";
+			//Handle the add command
+			String regexAddCmd = "^\\s*/(add).*";
 			if (input.matches(regexAddCmd))
 			{
 				if (recipient == null)
@@ -100,6 +109,7 @@ public class CLI {
 			}
 			
 			
+			//Handle the search command
 			String regexSearchCmd = "^\\s*/(search)\\s*(.*)$";
 			if (input.matches(regexSearchCmd))
 			{
@@ -125,6 +135,7 @@ public class CLI {
 			}
 			
 			
+			//Handle the select command
 			String regexSelectCmd = "^\\s*/(to|show|select)\\s*(.*)$";
 			if (input.matches(regexSelectCmd))
 			{
@@ -149,11 +160,13 @@ public class CLI {
 			}
 			
 			
+			//Exit command
 			String regexExitCmd = "^\\s*/(exit|quit|e|q).*";
 			if (input.matches(regexExitCmd))
 				break;
 		}
 
+		//Close resources
 		scanner.close();
 		chat.close();
 		System.out.println("Bye!");

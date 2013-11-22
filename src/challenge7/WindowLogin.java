@@ -23,8 +23,10 @@ import javax.swing.JButton;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JPasswordField;
 
+@SuppressWarnings("unused")
 public class WindowLogin {
 
 	private JFrame frmLogin;

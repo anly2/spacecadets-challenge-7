@@ -8,10 +8,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.JList;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import javax.swing.JButton;
 
+@SuppressWarnings("unused")
 public class WindowContacts {
 private Chat chat = new Chat();
 	private JFrame frmContacts;

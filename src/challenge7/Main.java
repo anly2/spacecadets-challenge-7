@@ -1,5 +1,8 @@
 package challenge7;
 
+/**
+ * Mainly a test unit
+ */
 public class Main {
 	public static void main (String[] args){
 		
