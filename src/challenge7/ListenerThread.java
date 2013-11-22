@@ -20,8 +20,7 @@ public class ListenerThread extends Thread implements Runnable {
 	 * @param chat the {@link Chat} object that created this Thread
 	 */
 	ListenerThread(Chat chat) {
-		this.chat = chat;		
-		this.start(); // Start the thread
+		this.chat = chat;
 	}
 	   
 	/**

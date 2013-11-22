@@ -11,10 +11,22 @@ import java.util.regex.Pattern;
  * @see Chat
  * @see WindowLogin
  */
-public class CLI {
+public class CLI implements ClientInterface, Runnable {
+	protected Chat chat;
+	protected String recipient;
+	
+	CLI () {
+		chat = new Chat(this);
+		recipient = null;
+	}
+	
 	public static void main (String[] args) {
+		ClientInterface intf = new CLI();
+		intf.run();
+	}
+			
+	public void run () {
 		//Initialization
-		Chat chat = new Chat();
 		Scanner scanner = new Scanner(System.in);
 		Console console = System.console();
 		
@@ -46,7 +58,6 @@ public class CLI {
 			
 		
 		//Handle user input
-		String recipient = null;
 		while (true)
 		{
 			System.out.print(chat.getUser() + (recipient==null ? "" : " to "+recipient) + " > ");
@@ -61,14 +72,24 @@ public class CLI {
 					//Prompt for Recipient selection
 					System.out.print("Select contact: ");
 					recipient = scanner.nextLine();
+					
+					//Not among known contacts?
+					if (!chat.contacts.containsKey(recipient))
+						System.out.println("(\""+recipient+"\" is not in your contact list.)");
 				}
 				
-				chat.sendMessage(recipient, input);
+				try {
+					chat.sendMessage(recipient, input);
+				}
+				catch (RuntimeException e) {
+					System.out.println("Could not connect to \""+recipient+"\".");
+					recipient = null;
+				}
 			}
 			
 			
 			//Handle the help command
-			String regexHelpCmd = "^\\s*/(help|h|?).*";
+			String regexHelpCmd = "^\\s*/(help|h|\\?).*";
 			if (input.matches(regexHelpCmd))
 			{
 				System.out.println("Manual:\n\n");
@@ -170,5 +191,22 @@ public class CLI {
 		scanner.close();
 		chat.close();
 		System.out.println("Bye!");
+	}
+
+	@Override
+	public void update(String... args) {
+		/**
+		 * What did change and needs updating
+		 */
+		String updateType = args[0];
+
+		// We've received a message, display it
+		if (updateType.equalsIgnoreCase("messages")) {
+			// Stop if the current chat is not with that person
+			if (!recipient.equalsIgnoreCase(args[1]))
+				return;
+			
+			System.out.println(recipient + ": "+chat.getMessage(recipient, -1));
+		}
 	}
 }

@@ -29,6 +29,12 @@ public class Chat {
 	 * An instance of {@link ListenerThread}
 	 */
 	protected Thread listener;
+	/**
+	 * The interface that the client sees and interacts with.
+	 * @see ClientInterface#update(String, String)
+	 * @see CLI
+	 */
+	protected ClientInterface clientInterface;
 	
 	/**
 	 * A {@link HashMap} with usernames as keys and a socket to the user as value
@@ -72,6 +78,15 @@ public class Chat {
 		contacts = new HashMap<>();
 		messages = new HashMap<>();
 	}
+
+	/**
+	 * Initializes the instance variables and stores a reference to the client interface
+	 * @param intf the client interface running this
+	 */
+	public Chat (ClientInterface intf) {
+		this ();
+		clientInterface = intf;
+	}
 	
 	
 	/* Accessors */
@@ -80,11 +95,46 @@ public class Chat {
 	 * @return the username of the currently logged user.
 	 * <br /> Will be <code>null</code> if not logged in yet
 	 */
-	public String getUser() {
+	public String getUser () {
 		return username;
 	}
 	
-
+	/**
+	 * Gets a message from a specified user
+	 * <br />
+	 * <br /> Note that negative messageIndex values ARE allowed.
+	 * <br /> If the index is negative it gets calculated to <code>(messages.size() - i)</code>
+	 * 
+	 * <dl>
+	 * 	<dt>Example:</dt>
+	 * 		<dd> messages from "wife": &nbsp; "Buy" "eggs" "this" "time!"
+	 * 		<dd> getMessage("wife", 0) returns "Buy" </dd>
+	 *  	<dd> getMessage("wife", -1) returns "time!" </dd>
+	 * </dl>
+	 *  
+	 * @param userFrom the username of the contact from whom the message is
+	 * @param messageIndex the index of the message. Note that it can be a negative number!
+	 * @return Returns the <b>nth message</b> from the specified user
+	 * <br /> or the <b>last nth message</b> if the index was negative 
+	 * @throws RuntimeException if there is no message with that index
+	 * @throws RuntimeException if there are no messages from that user (or if the user does not exist)
+	 * @see #messages
+	 * @see #addMessage(String, String)
+	 */
+	public String getMessage (String userFrom, int messageIndex) throws RuntimeException {
+		ArrayList<String> messages = this.messages.get(userFrom);
+		
+		if (messages == null)
+			throw new RuntimeException ("No messages found from that user! (User may not exists)");
+		
+		int i = (messageIndex < 0) ? (messages.size() - messageIndex) : messageIndex;
+		
+		if (i < 0 || i >= messages.size())
+			throw new RuntimeException ("Message index out of bounds!");
+		
+		return messages.get(i);
+	}
+	
 	/* Main methods */
 	
 	/**
@@ -133,14 +183,14 @@ public class Chat {
 	 * <br />If the recipient is known, creates a socket and writes to its Input Stream 
 	 * @param recipient the username of the user to whom to send the message
 	 * @param message the actual message
-	 * @throws <i>SHOULD throw</i> {@link Exception} if {@link #connect(String)} failed
+	 * @throws RuntimeException if {@link #connect(String)} failed
 	 * @see #connect(String)
 	 * @see #username
 	 */
-	public void sendMessage(String recipient, String message)
+	public void sendMessage(String recipient, String message) throws RuntimeException
 	{
 		if (!connect(recipient))
-			return; ////Exception!
+			throw new RuntimeException("Failed to find user \""+recipient+"\"");
 
 		Socket socket = contacts.get(recipient);
 		PrintWriter sender;
@@ -211,6 +261,8 @@ public class Chat {
 	 */
 	public void addMessage(String contact, String message) {
 		messages.get(contact).add(message);
+		
+		//clientInterface.update("message", contact);
 	}
 
 	/**
@@ -249,4 +301,5 @@ public class Chat {
 	public void stop() {
 		this.close();
 	}
+	
 }
