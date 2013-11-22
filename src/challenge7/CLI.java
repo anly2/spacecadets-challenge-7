@@ -28,7 +28,6 @@ public class CLI implements ClientInterface, Runnable {
 	public void run () {
 		//Initialization
 		Scanner scanner = new Scanner(System.in);
-		Console console = System.console();
 		
 		//Welcome
 		System.out.println("*** Welcome to the console version of this chat client! ***");
@@ -38,15 +37,7 @@ public class CLI implements ClientInterface, Runnable {
 		System.out.println("Please log in. (Automatic registration is on)");
 		System.out.print("Username: ");
 		String username = scanner.nextLine();
-		String password;
-			if (console != null)
-				password = new String(console.readPassword("Password: "));
-			else
-			{
-				System.out.print("Password: ");
-				password = scanner.nextLine();
-			}
-			////password = hash(password);
+		String password = new Password().read("Password: ").hash(username);
 		
 		//Check if credentials are correct
 		if (!chat.login(username, password))
