@@ -1,6 +1,10 @@
 package challenge7;
 
 import java.io.Console;
+<<<<<<< HEAD
+=======
+import java.util.Scanner;
+>>>>>>> b93ec9d584729e98a7a5e6cd219a7920dd8a3061
 
 public class Password {
 	private String password;
@@ -84,6 +88,7 @@ public class Password {
 	
 	/**
 	 * Reads the standard input for a password.
+<<<<<<< HEAD
 	 * <p> The read password is {@link #normalize() normalized} </p>
 	 * <p>
 	 *	 <b>Note</b> that this is dependent on the {@link CLI} class
@@ -94,15 +99,35 @@ public class Password {
 	 * @return Returns this Password object
 	 * @see #normalize()
 	 * @see CLI#prompt(String)
+=======
+	 * <br /> The read line is #
+	 * @param prompt the prompt that is printed before the program starts listening for input
+	 * @return Returns this Password object
+	 * 
+>>>>>>> b93ec9d584729e98a7a5e6cd219a7920dd8a3061
 	 */
 	public Password read (String prompt) {
 		Console console = System.console();
 		
+<<<<<<< HEAD
 		//Noticeably dependent on the CLI class
 		if (console != null)
 			password = new String(console.readPassword(prompt));
 		else
 			password = CLI.prompt(prompt);
+=======
+		if (console != null)
+			password = new String(console.readPassword("Password: "));
+		else
+		{
+			Scanner scanner = new Scanner(System.in);
+			
+			System.out.print("Password: ");
+			password = scanner.nextLine();
+			
+			scanner.close();
+		}
+>>>>>>> b93ec9d584729e98a7a5e6cd219a7920dd8a3061
 		
 		normalize ();		
 		return this; //allows chain calls
