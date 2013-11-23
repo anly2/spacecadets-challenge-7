@@ -1,7 +1,6 @@
 package challenge7;
 
 import java.io.Console;
-import java.util.Scanner;
 
 public class Password {
 	private String password;
@@ -85,10 +84,16 @@ public class Password {
 	
 	/**
 	 * Reads the standard input for a password.
-	 * <br /> The read line is #
+	 * <br /> The read line is {@link #normalize() normalized}
+	 * <p>
+	 * 		<b>Note</b> that this method is dependent on the {@link CLI} class <br />
+	 * 		in the cases when {@link System#console()} is null and plain input is needed. <br />
+	 * 		Hense the call to {@link CLI#prompt(String)}
+	 * </p>
 	 * @param prompt the prompt that is printed before the program starts listening for input
 	 * @return Returns this Password object
-	 * 
+	 * @see CLI#prompt(String)
+	 * @see #normalize()
 	 */
 	public Password read (String prompt) {
 		Console console = System.console();
@@ -96,14 +101,7 @@ public class Password {
 		if (console != null)
 			password = new String(console.readPassword("Password: "));
 		else
-		{
-			Scanner scanner = new Scanner(System.in);
-			
-			System.out.print("Password: ");
-			password = scanner.nextLine();
-			
-			scanner.close();
-		}
+			password = CLI.prompt ("Password: ");
 		
 		normalize ();		
 		return this; //allows chain calls

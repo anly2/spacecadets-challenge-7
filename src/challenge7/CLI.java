@@ -1,5 +1,8 @@
 package challenge7;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,14 +17,13 @@ import java.util.regex.Pattern;
 public class CLI implements ClientInterface, Runnable {
 	/* Instance variables */
 	protected Chat chat;
-	protected Scanner scanner;
 	protected String recipient;
 	
 	/* Constants */
 	protected static String regexHelpCmd = "^\\s*/(help|h|\\?).*";
 	protected static String regexAddCmd  = "^\\s*/(add).*";
-	protected static String regexSearchCmd = "^\\s*/(search)\\s*(.*)$";
-	protected static String regexSelectCmd = "^\\s*/(to|show|select)\\s*(.*)$";
+	protected static String regexSearchCmd = "^\\s*/(search)\\s*(|.*)$";
+	protected static String regexSelectCmd = "^\\s*/(to|show|select)\\s*(|.*)$";
 	protected static String regexExitCmd = "^\\s*/(exit|quit|e|q).*";
 	
 	
@@ -34,7 +36,6 @@ public class CLI implements ClientInterface, Runnable {
 	 */	
 	CLI () {
 		chat = new Chat(this);
-		scanner = new Scanner(System.in);
 		recipient = null;
 	}
 	
@@ -69,41 +70,42 @@ public class CLI implements ClientInterface, Runnable {
 		//Handle user input
 		while (true)
 		{
-			//Print the prefix
-			System.out.print(chat.getUser() + (recipient==null ? "" : " to "+recipient) + " > ");
-			
-			//Get the input
-			String input = scanner.nextLine();
-			
-			
-			//Handle messages
-			if (!input.matches("^\\s*/"))
-				message (input);
-			
+			//Get input (and print the prefix)
+			String input = prompt(chat.getUser() + (recipient==null ? "" : " to "+recipient) + " > ");
+
 			
 			//Handle the help command
 			if (input.matches(regexHelpCmd))
 				helpCommand();
+			else
 			
-			
+				
 			//Handle the add command
 			if (input.matches(regexAddCmd))
 				addCommand();
-			
+			else
+				
 			
 			//Handle the search command
 			if (input.matches(regexSearchCmd))
 				searchCommand (input);
-			
+			else
+				
 			
 			//Handle the select command
 			if (input.matches(regexSelectCmd))
 				selectCommand (input);
-			
+			else
+				
 			
 			//Exit command
 			if (input.matches(regexExitCmd))
 				exitCommand ();
+			else
+			
+				
+			//Handle messages
+			message (input);
 		}
 	}
 	
@@ -118,8 +120,7 @@ public class CLI implements ClientInterface, Runnable {
 	 */
 	protected boolean login () {
 		System.out.println("Please log in. (Automatic registration is on)");
-		System.out.print("Username: ");
-		String username = scanner.nextLine();
+		String username = prompt ("Username: ");
 		String password = new Password().read("Password: ").hash(username);
 		
 		//Check if credentials are correct
@@ -144,28 +145,19 @@ public class CLI implements ClientInterface, Runnable {
 	 */
 	protected boolean message (String message) {
 		//Send message
-		if (recipient == null)
-			//selectCommand()
-		{
-			//Prompt for Recipient selection
-			System.out.print("Select contact: ");
-			recipient = scanner.nextLine();
-			
-			//Not among known contacts?
-			if (!chat.contacts.containsKey(recipient))
-				System.out.println("(\""+recipient+"\" is not in your contact list.)");
-		}
+		if (recipient == null && !selectCommand("/to"))
+				return false;
 		
 		try {
 			chat.sendMessage(recipient, message);
+			return true;
 		}
 		catch (RuntimeException e) {
 			System.out.println("Could not connect to \""+recipient+"\".");
 			recipient = null;
-			return false;
 		}
 		
-		return true;
+		return false;
 	}
 	
 	/**
@@ -232,19 +224,16 @@ public class CLI implements ClientInterface, Runnable {
 		matcher.find();
 		
 		String keyword;
-		if (matcher.groupCount() > 1)
-			keyword = matcher.group(2);
+		if (matcher.groupCount() <= 1 || matcher.group(2) == null || matcher.group(2).equals(""))
+			keyword =  prompt ("Enter keyword: ");
 		else
-		{
-			System.out.print("Enter keyword: ");
-			keyword = scanner.nextLine();
-		}
+			keyword = matcher.group(2);
 		
 		String[] contacts = chat.getContacts();
 		
 		for (String contact: contacts)
 			if (contact.toLowerCase().contains(keyword))
-				System.out.print("\n" + contact);
+				System.out.print(" " + contact + "\n");
 		
 		return true;
 	}
@@ -262,13 +251,17 @@ public class CLI implements ClientInterface, Runnable {
 		Matcher matcher = Pattern.compile(regexSelectCmd).matcher(input);
 		matcher.find();
 		
-		if (matcher.groupCount() > 1)
-			recipient = matcher.group(2);
+		if (matcher.groupCount() <= 1 || matcher.group(2) == null || matcher.group(2).equals(""))
+			recipient = prompt ("Select contact: ");
 		else
-		{
-			System.out.print("Select contact: ");
-			recipient = scanner.nextLine();
-		}
+			recipient = matcher.group(2);
+		
+		
+		if (chat.getUser().equalsIgnoreCase(recipient))
+			//throw new RuntimeException ("Cannot chat with yourself!");
+			return false;
+		
+		
 		
 		if (!chat.connect(recipient))
 		{
@@ -276,6 +269,8 @@ public class CLI implements ClientInterface, Runnable {
 			System.out.println("Contact was not found!");
 			return false;
 		}
+		else if (!chat.contacts.containsKey(recipient))
+			System.out.println("(\""+recipient+"\" is not in your contact list.)");
 		
 		return true;
 	}
@@ -286,7 +281,6 @@ public class CLI implements ClientInterface, Runnable {
 	 */
 	protected boolean exitCommand () {
 		//Close resources
-		scanner.close();
 		chat.close();
 		
 		System.out.println("Bye!");
@@ -330,5 +324,41 @@ public class CLI implements ClientInterface, Runnable {
 			return;
 		
 		System.out.println(recipient + ": "+chat.getMessage(recipient, -1));
+	}
+
+
+	/* Helper methods */
+	
+	/** 
+	 * Alias of {@link #prompt(String, String) prompt(message, "")}
+	 */
+	public static String prompt (String message) {
+		return prompt (message, "");
+	}
+
+	/**
+	 * Prompts the user for input
+	 * <br />Prints the prompt message then reads a line from the standard input
+	 * @param message the prompt message to be displayed before starting to listen for input
+	 * @param dfault the default value to return if an Exception happens
+	 * <br /> Note that this can be used as return type selector,
+	 * <br /> or in other words, this can be changed to easily overload the prompt method for other types (say int)
+	 * @return Returns <b>a read line</b> from stdin or the <code>dfault</code> value if something went wrong
+	 * @see #prompt(String) 
+	 */
+	public static String prompt (String message, String dfault)
+	{
+		//print the prompt message
+		System.out.print(message);
+
+		//read a line from the standard input
+		try {
+			return (new BufferedReader(new InputStreamReader(System.in))).readLine();
+		} catch (IOException ioe) {
+			System.err.println(ioe.toString());
+		}
+
+		//return the provided default value
+		return dfault;
 	}
 }
